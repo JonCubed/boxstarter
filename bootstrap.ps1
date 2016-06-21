@@ -1,5 +1,3 @@
-#iex (((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1')) -InstallDev -SourceCodeFolder '/git' -SkipWindowsUpdate)
-
 param
 (
     [Switch]

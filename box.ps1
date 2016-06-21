@@ -37,8 +37,7 @@
 	[Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Process") # for right now
 
 #START
-	START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1
-	START http://boxstarter.org/package/nr/url?https://gist.githubusercontent.com/JonCubed/93c8e02148569202b455725f2ecc6785/raw/ec52347065f8bfe33309f031476da42e1610c683/box.ps1
+	START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
 
 #>
 
