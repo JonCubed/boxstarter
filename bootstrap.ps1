@@ -93,16 +93,18 @@ if ($SqlServer2016IsoImage)
     Set-EnvironmentVariable -Key "choco:sqlserver2016:isoImage" -Value $SqlServer2016IsoImage
 }
 
-$installScript = 'http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1'
+$installScript = 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1'
+$webLauncherUrl = "http://boxstarter.org/package/nr/url?$installScript"
 $edgeVersion = Get-AppxPackage -Name Microsoft.MicrosoftEdge
 
 if ($edgeVersion)
 {
-    start microsoft-edge:$installScript
+    start microsoft-edge:$webLauncherUrl
 }
 else
 {
     $IE=new-object -com internetexplorer.application
-    $IE.navigate2($installScript)
+    $IE.navigate2($webLauncherUrl)
     $IE.visible=$true
 }
+

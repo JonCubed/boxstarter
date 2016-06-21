@@ -82,14 +82,19 @@ function Install-WebPackage {
         $fileType,
         $installParameters,
         $downloadFolder,
-        $url
+        $url,
+        $filename
     )
 
-    $filename = Split-Path $url -Leaf
+    if ([String]::IsNullOrEmpty($filename))
+    {
+        $filename = Split-Path $url -Leaf
+    }
+    
     $fullFilename = Join-Path $downloadFolder $filename
 
     if (test-path $fullFilename) {
-        Write-Host "$fullFilename already exists"
+        Write-BoxstarterMessage "$fullFilename already exists"
         return
     }
 
@@ -242,8 +247,8 @@ function Install-VisualStudio
     code --install-extension WallabyJs.wallaby-vscode
 
     # install .NET Core
-    Install-WebPackage '.NET Core Cli' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 # cli
-    Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 # for visual studio
+    Install-WebPackage '.NET Core Cli' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 'DotNetCore.1.0.0.RC2-SDK.Preview1-x64.exe' # cli
+    Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 'DotNetCore.1.0.0.RC2-VS2015Tools.Preview1.exe' # for visual studio
 }
 
 function Install-InternetInformationServices
@@ -342,7 +347,7 @@ function Set-DevDesktopSettings
 {
     Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe"
 
-    Install-ChocolateyFileAssociation ".dll" "$($Boxstarter.programFiles86)\jetbrains\dotpeek\v1.1\Bin\dotpeek32.exe"
+    Install-ChocolateyFileAssociation ".dll" "$env:LOCALAPPDATA\JetBrains\Installations\dotPeek05\dotPeek64.exe"
 }
 
 function Move-WindowsLibrary {
@@ -494,7 +499,7 @@ Update-Path
 
 Install-NpmPackages
 
-[Environment]::SetEnvironmentVariable("HOME", $Env:UserProfile, "User")
+[Environment]::SetEnvironmentVariable("HOME", $env:UserProfile, "User")
 
 # rerun windows update after we have installed everything
 Write-BoxstarterMessage "Windows update..."
