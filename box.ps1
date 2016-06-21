@@ -222,7 +222,7 @@ function Install-VisualStudio
     Install-ChocolateyVsixPackage 'Web Compiler' https://visualstudiogallery.msdn.microsoft.com/3b329021-cd7a-4a01-86fc-714c2d05bb6c/file/164873/35/Web%20Compiler%20v1.10.300.vsix
     Install-ChocolateyVsixPackage 'Image Optimizer' https://visualstudiogallery.msdn.microsoft.com/a56eddd3-d79b-48ac-8c8f-2db06ade77c3/file/38601/34/Image%20Optimizer%20v3.3.51.vsix
     Install-ChocolateyVsixPackage 'Package Installer' https://visualstudiogallery.msdn.microsoft.com/753b9720-1638-4f9a-ad8d-2c45a410fd74/file/173807/20/Package%20Installer%20v1.5.69.vsix
-    Install-ChocolateyVsixPackage 'PostSharp' https://visualstudiogallery.msdn.microsoft.com/a058d5d3-e654-43f8-a308-c3bdfdd0be4a/file/89212/88/PostSharp-4.2.27.exe
+    #Install-ChocolateyVsixPackage 'PostSharp' https://visualstudiogallery.msdn.microsoft.com/a058d5d3-e654-43f8-a308-c3bdfdd0be4a/file/89212/88/PostSharp-4.2.27.exe  # installation errors
     Install-ChocolateyVsixPackage 'BuildVision' https://visualstudiogallery.msdn.microsoft.com/23d3c821-ca2d-4e1a-a005-4f70f12f77ba/file/95980/13/BuildVision.vsix
     Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/32/File%20Nesting%20v2.5.62.vsix
 
@@ -360,10 +360,10 @@ function Set-RegionalSettings
 	#http://stackoverflow.com/questions/4235243/how-to-set-timezone-using-powershell
 	&"$env:windir\system32\tzutil.exe" /s "AUS Eastern Standard Time"
 
-	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortDate -Value dd-MMM-yy
+	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortDate -Value 'dd MMM yy'
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sCountry -Value Australia
-	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortTime -Value hh:mm tt
-	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sTimeFormat -Value hh:mm:ss tt
+	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortTime -Value 'hh:mm tt'
+	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sTimeFormat -Value 'hh:mm:ss tt'
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sLanguage -Value ENA
 }
 
