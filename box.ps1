@@ -1,8 +1,8 @@
-<# 
+<#
 
 #OPTIONAL
 
-	** Windows 7 ** 
+	** Windows 7 **
 	Should upgrade to WMF 5 first for reduced errors
 	https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
@@ -15,27 +15,27 @@
 
     [Environment]::SetEnvironmentVariable("BoxStarter:SourceCodeFolder", "git", "Machine") # relative path to for reboots
 	[Environment]::SetEnvironmentVariable("BoxStarter:SourceCodeFolder", "git", "Process") # for right now
-	
+
 	[Environment]::SetEnvironmentVariable("BoxStarter:SkipWindowsUpdate", "1", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("BoxStarter:SkipWindowsUpdate", "1", "Process") # for right now
 
 	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Process") # for right now
-	
+
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2008:isoImage", "D:\Downloads\en_sql_server_2008_r2_developer_x86_x64_ia64_dvd_522665.iso", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2008:isoImage", "D:\Downloads\en_sql_server_2008_r2_developer_x86_x64_ia64_dvd_522665.iso", "Process") # for right now
-	
+
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2012:isoImage", "D:\Downloads\en_sql_server_2012_developer_edition_with_service_pack_3_x64_dvd_7286643.iso", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2012:isoImage", "D:\Downloads\en_sql_server_2012_developer_edition_with_service_pack_3_x64_dvd_7286643.iso", "Process") # for right now
-	
+
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Process") # for right now
-	
-	
+
+
 	# If Home Machine
 	[Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Process") # for right now
-	
+
 #START
 	START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1
 	START http://boxstarter.org/package/nr/url?https://gist.githubusercontent.com/JonCubed/93c8e02148569202b455725f2ecc6785/raw/ec52347065f8bfe33309f031476da42e1610c683/box.ps1
@@ -65,11 +65,11 @@ function Get-DataDrive
 
 function Install-WindowsUpdate
 {
-    if (Test-Path env:\BoxStarter:SkipWindowsUpdate) 
+    if (Test-Path env:\BoxStarter:SkipWindowsUpdate)
     {
         return
     }
-    
+
 	Enable-MicrosoftUpdate
 	Install-WindowsUpdate -AcceptEula
 	if (Test-PendingReboot) { Invoke-Reboot }
@@ -92,7 +92,7 @@ function Install-WebPackage {
         Write-Host "$fullFilename already exists"
         return
     }
-    
+
     Get-ChocolateyWebFile $packageName $fullFilename $url
     Install-ChocolateyInstallPackage $packageName $fileType $installParameters $fullFilename
 }
@@ -115,7 +115,7 @@ function Install-HomeApps
 }
 
 function Install-SqlServer
-{	
+{
     param (
         $InstallDrive
     )
@@ -126,10 +126,10 @@ function Install-SqlServer
 	$sqlPackageSource = "https://www.myget.org/F/nm-chocolatey-packs/api/v2"
 
 	choco install sqlstudio --source=$sqlPackageSource
-		
+
     if ((Test-Path env:\choco:sqlserver2008:isoImage) -or (Test-Path env:\choco:sqlserver2008:setupFolder))
     {
-	    if (Test-PendingReboot) { Invoke-Reboot }	
+	    if (Test-PendingReboot) { Invoke-Reboot }
 	    $env:choco:sqlserver2008:INSTANCEID="sql2008"
 	    $env:choco:sqlserver2008:INSTANCENAME="sql2008"
 	    $env:choco:sqlserver2008:AGTSVCACCOUNT="NT AUTHORITY\SYSTEM"
@@ -139,7 +139,7 @@ function Install-SqlServer
         $env:choco:sqlserver2008:SECURITYMODE="SQL"                 # mixed mode auth
 	    choco install sqlserver2008 --source=$sqlPackageSource
     }
-	
+
     if ((Test-Path env:\choco:sqlserver2012:isoImage) -or (Test-Path env:\choco:sqlserver2012:setupFolder))
     {
 	    if (Test-PendingReboot) { Invoke-Reboot }
@@ -153,12 +153,12 @@ function Install-SqlServer
         $env:choco:sqlserver2012:SECURITYMODE="SQL"                 # mixed mode auth
 	    choco install sqlserver2012 --source=$sqlPackageSource
     }
-	
+
     if ((Test-Path env:\choco:sqlserver2016:isoImage) -or (Test-Path env:\choco:sqlserver2016:setupFolder))
     {
 		# Note: No support for Windows 7 https://msdn.microsoft.com/en-us/library/ms143506.aspx
 		if (Test-PendingReboot) { Invoke-Reboot }
-		$env:choco:sqlserver2016:INSTALLSQLDATADIR=$dataPath 
+		$env:choco:sqlserver2016:INSTALLSQLDATADIR=$dataPath
 		$env:choco:sqlserver2016:INSTANCEID="sql2016"
 		$env:choco:sqlserver2016:INSTANCENAME="sql2016"
 		$env:choco:sqlserver2016:AGTSVCACCOUNT="NT Service\SQLAgent`$SQL2016"
@@ -166,7 +166,7 @@ function Install-SqlServer
 		$env:choco:sqlserver2016:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
         $env:choco:sqlserver2016:SECURITYMODE="SQL"                 # mixed mode auth
 		choco install sqlserver2016 --source=$sqlPackageSource
-    }	
+    }
 }
 
 function Install-CoreDevApps
@@ -187,27 +187,27 @@ function Install-CoreDevApps
 }
 
 function Install-DevTools
-{    
+{
     param (
         $DownloadFolder
     )
 
 	choco install jdk8		        	    --limitoutput
     choco install slack                     --limitoutput
-    choco install redis-desktop-manager     --limitoutput    
+    choco install redis-desktop-manager     --limitoutput
     choco install packer               	    --limitoutput
 	choco install putty               	    --limitoutput
     choco install fiddler4               	--limitoutput
 	choco install winscp              	    --limitoutput
 	choco install nmap                	    --limitoutput
 	choco install nugetpackageexplorer	    --limitoutput
-	choco install diffmerge				    --limitoutput	
+	choco install diffmerge				    --limitoutput
 
     Install-WebPackage 'Docker Toolbox' 'exe' '/SILENT /COMPONENTS="Docker,DockerMachine,DockerCompose,VirtualBox,Kitematic" /TASKS="modifypath"' $DownloadFolder https://github.com/docker/toolbox/releases/download/v1.11.2/DockerToolbox-1.11.2.exe
 }
 
 function Install-VisualStudio
-{	
+{
     param (
         $DownloadFolder
     )
@@ -222,10 +222,10 @@ function Install-VisualStudio
     Install-ChocolateyVsixPackage 'Web Compiler' https://visualstudiogallery.msdn.microsoft.com/3b329021-cd7a-4a01-86fc-714c2d05bb6c/file/164873/35/Web%20Compiler%20v1.10.300.vsix
     Install-ChocolateyVsixPackage 'Image Optimizer' https://visualstudiogallery.msdn.microsoft.com/a56eddd3-d79b-48ac-8c8f-2db06ade77c3/file/38601/34/Image%20Optimizer%20v3.3.51.vsix
     Install-ChocolateyVsixPackage 'Package Installer' https://visualstudiogallery.msdn.microsoft.com/753b9720-1638-4f9a-ad8d-2c45a410fd74/file/173807/20/Package%20Installer%20v1.5.69.vsix
-    Install-ChocolateyVsixPackage 'PostSharp' https://visualstudiogallery.msdn.microsoft.com/a058d5d3-e654-43f8-a308-c3bdfdd0be4a/file/89212/78/PostSharp-4.2.18.exe
+    Install-ChocolateyVsixPackage 'PostSharp' https://visualstudiogallery.msdn.microsoft.com/a058d5d3-e654-43f8-a308-c3bdfdd0be4a/file/89212/88/PostSharp-4.2.27.exe
     Install-ChocolateyVsixPackage 'BuildVision' https://visualstudiogallery.msdn.microsoft.com/23d3c821-ca2d-4e1a-a005-4f70f12f77ba/file/95980/13/BuildVision.vsix
-    Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/23/File%20Nesting%20v2.2.36.vsix
-    
+    Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/32/File%20Nesting%20v2.5.62.vsix
+
     # install visual studio code and extensions
     choco install visualstudiocode	--limitoutput
 
@@ -248,7 +248,7 @@ function Install-InternetInformationServices
 {
     # Enable Internet Information Services Feature - will enable a bunch of things by default
 	choco install IIS-WebServerRole                 --source windowsfeatures --limitoutput
-    
+
     # Web Management Tools Features
     choco install IIS-ManagementScriptingTools      --source windowsfeatures --limitoutput
 	choco install IIS-IIS6ManagementCompatibility   --source windowsfeatures --limitoutput # installs IIS Metbase
@@ -268,23 +268,23 @@ function Install-InternetInformationServices
 
 	# Health And Diagnostics Features
 	choco install IIS-LoggingLibraries              --source windowsfeatures --limitoutput # installs Logging Tools
-	choco install IIS-RequestMonitor                --source windowsfeatures --limitoutput 
-	choco install IIS-HttpTracing                   --source windowsfeatures --limitoutput 
-	choco install IIS-CustomLogging                 --source windowsfeatures --limitoutput 
+	choco install IIS-RequestMonitor                --source windowsfeatures --limitoutput
+	choco install IIS-HttpTracing                   --source windowsfeatures --limitoutput
+	choco install IIS-CustomLogging                 --source windowsfeatures --limitoutput
 
 	# Performance Features
-	choco install IIS-HttpCompressionDynamic        --source windowsfeatures --limitoutput 
-    
-    # Security Features
-	choco install IIS-BasicAuthentication           --source windowsfeatures --limitoutput 
+	choco install IIS-HttpCompressionDynamic        --source windowsfeatures --limitoutput
 
-    if (Test-Path env:\BoxStarter:EnableWindowsAuthFeature) 
+    # Security Features
+	choco install IIS-BasicAuthentication           --source windowsfeatures --limitoutput
+
+    if (Test-Path env:\BoxStarter:EnableWindowsAuthFeature)
     {
-        choco install IIS-WindowsAuthentication     --source windowsfeatures --limitoutput 
-    }    
+        choco install IIS-WindowsAuthentication     --source windowsfeatures --limitoutput
+    }
 }
 
-function Install-NpmPackages 
+function Install-NpmPackages
 {
     npm install -g angular-cli # angular2 cli
     npm install -g typings
@@ -303,13 +303,13 @@ function Set-ChocoCoreAppPins
 {
     # pin apps that update themselves
     choco pin add -n=googlechrome
-    choco pin add -n=Firefox 
+    choco pin add -n=Firefox
     choco pin add -n='paint.net'
 }
 
 function Set-ChocoDevAppPins
 {
-    # pin apps that update themselves    
+    # pin apps that update themselves
     choco pin add -n=visualstudiocode
     choco pin add -n=visualstudio2015community
     choco pin add -n=sourcetree
@@ -325,10 +325,10 @@ function Set-BaseSettings
 	Set-TaskbarOptions -Combine Never
 
     # replace command prompt with powershell in start menu and win+x
-    Set-CornerNavigationOptions -EnableUsePowerShellOnWinX 	
-	
+    Set-CornerNavigationOptions -EnableUsePowerShellOnWinX
+
     # Disable hibernate
-	Start-Process 'powercfg.exe' -Verb runAs -ArgumentList '/h off'		
+	Start-Process 'powercfg.exe' -Verb runAs -ArgumentList '/h off'
 }
 
 function Set-BaseDesktopSettings
@@ -348,7 +348,7 @@ function Move-WindowsLibrary {
         $libraryName,
         $newPath
     )
-    
+
     if(-not (Test-Path $newPath))  #idempotent
 	{
         Move-LibraryDirectory -libraryName $libraryName -newPath $newPath
@@ -359,7 +359,7 @@ function Set-RegionalSettings
 {
 	#http://stackoverflow.com/questions/4235243/how-to-set-timezone-using-powershell
 	&"$env:windir\system32\tzutil.exe" /s "AUS Eastern Standard Time"
-	
+
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortDate -Value dd-MMM-yy
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sCountry -Value Australia
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortTime -Value hh:mm tt
@@ -383,16 +383,16 @@ function New-SourceCodeFolder
 
     if ([System.IO.Path]::IsPathRooted($sourceCodeFolder)) {
         $sourceCodePath = $sourceCodeFolder
-    } 
+    }
     else
     {
         $drivePath = Get-DataDrive
         $sourceCodePath = Join-Path "$drivePath`:" $sourceCodeFolder
     }
-    
+
     if(-not (Test-Path $sourceCodePath)) {
         New-Item $sourceCodePath -ItemType Directory
-    } 
+    }
 }
 
 function New-InstallCache
@@ -423,13 +423,13 @@ Write-BoxstarterMessage "Windows update..."
 Install-WindowsUpdate
 
 # disable chocolatey default confirmation behaviour (no need for --yes)
-choco feature enable --name=allowGlobalConfirmation	
+choco feature enable --name=allowGlobalConfirmation
 
 Set-BaseSettings
 Set-UserSettings
 
 Write-BoxstarterMessage "Starting installs"
-	
+
 Install-CoreApps
 
 # pin chocolatey app that self-update
@@ -445,7 +445,7 @@ if (Test-Path env:\BoxStarter:InstallDev)
 	Install-SqlServer -InstallDrive $dataDrive
     Install-VisualStudio -DownloadFolder $tempInstallFolder
     Install-InternetInformationServices
-    
+
     # make folder for source code
     New-SourceCodeFolder
 
@@ -463,12 +463,12 @@ if (Test-Path env:\BoxStarter:InstallHome)
 if (Get-SystemDrive -ne $dataDriveLetter)
 {
     Write-BoxstarterMessage "Configuring $dataDrive\"
-	
+
     Set-Volume -DriveLetter $dataDriveLetter -NewFileSystemLabel "Data"
-	
+
     $userDataPath = "$dataDrive\Data\Documents"
     $mediaPath = "$dataDrive\Media"
-	
+
     Move-WindowsLibrary -libraryName "My Pictures" -newPath (Join-Path $userDataPath "Pictures")
     Move-WindowsLibrary -libraryName "Personal"    -newPath (Join-Path $userDataPath "Documents")
     Move-WindowsLibrary -libraryName "Desktop"     -newPath (Join-Path $userDataPath "Desktop")
@@ -482,9 +482,9 @@ choco feature disable --name=allowGlobalConfirmation
 
 if (Test-PendingReboot) { Invoke-Reboot }
 
-# reload path environment variable 
+# reload path environment variable
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-    
+
 Install-NpmPackages
 
 [Environment]::SetEnvironmentVariable("HOME", $Env:UserProfile, "User")
