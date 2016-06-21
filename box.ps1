@@ -229,6 +229,8 @@ function Install-VisualStudio
     # install visual studio code and extensions
     choco install visualstudiocode	--limitoutput
 
+    Update-Path
+
     code --install-extension ms-vscode.csharp
     code --install-extension ms-vscode.PowerShell
     code --install-extension DavidAnson.vscode-markdownlint
@@ -240,8 +242,8 @@ function Install-VisualStudio
     code --install-extension WallabyJs.wallaby-vscode
 
     # install .NET Core
-    Install-WebPackage '.NET Core Cli' 'exe' '/SILENT' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 # cli
-    Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/SILENT' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 # for visual studio
+    Install-WebPackage '.NET Core Cli' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 # cli
+    Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 # for visual studio
 }
 
 function Install-InternetInformationServices
@@ -412,6 +414,11 @@ function New-InstallCache
     return $tempInstallFolder
 }
 
+function Update-Path
+{
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+}
+
 $dataDriveLetter = Get-DataDrive
 $dataDrive = "$dataDriveLetter`:"
 $tempInstallFolder = New-InstallCache -InstallDrive $dataDrive
@@ -483,7 +490,7 @@ choco feature disable --name=allowGlobalConfirmation
 if (Test-PendingReboot) { Invoke-Reboot }
 
 # reload path environment variable
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+Update-Path
 
 Install-NpmPackages
 
