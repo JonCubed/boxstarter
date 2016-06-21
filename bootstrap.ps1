@@ -1,6 +1,6 @@
 #iex (((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1')) -InstallDev -SourceCodeFolder '/git' -SkipWindowsUpdate)
 
-param 
+param
 (
     [Switch]
     $InstallDev = $false,
@@ -13,10 +13,10 @@ param
 
     [String]
     $SourceCodeFolder,
-    
+
     [Switch]
     $SkipWindowsUpdate,
-    
+
     [Switch]
     $EnableWindowsAuthFeature,
 
@@ -32,28 +32,28 @@ param
 
 function Set-EnvironmentVariable
 {
-    param 
+    param
     (
         [String]
         [Parameter(Mandatory=$true)]
         $Key,
-        
+
         [String]
         [Parameter(Mandatory=$true)]
-        $Value,
+        $Value
     )
-    
+
     [Environment]::SetEnvironmentVariable($Key, $Value, "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable($Key, $Value, "Process") # for right now
 
 }
 
-if ($InstallDev) 
+if ($InstallDev)
 {
     Set-EnvironmentVariable -Key "BoxStarter:InstallDev" -Value "1"
 }
 
-if ($InstallHome) 
+if ($InstallHome)
 {
     Set-EnvironmentVariable -Key "BoxStarter:InstallHome" -Value "1"
 }
@@ -94,10 +94,10 @@ if ($SqlServer2016IsoImage)
 }
 
 $installScript = 'http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1'
-$edgeVersion = Get-AppxPackage -Name Microsoft.MicrosoftEdge 
+$edgeVersion = Get-AppxPackage -Name Microsoft.MicrosoftEdge
 
 if ($edgeVersion)
-{ 
+{
     start microsoft-edge:$installScript
 }
 else
