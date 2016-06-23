@@ -451,11 +451,11 @@ Set-BaseDesktopSettings
 if (Test-Path env:\BoxStarter:InstallDev)
 {
 	Write-BoxstarterMessage "Installing dev apps"
-	Install-CoreDevApps
-	Install-DevTools  -DownloadFolder $tempInstallFolder
 	Install-SqlServer -InstallDrive $dataDrive
     Install-VisualStudio -DownloadFolder $tempInstallFolder
     Install-InternetInformationServices
+	Install-CoreDevApps
+	Install-DevTools  -DownloadFolder $tempInstallFolder
 
     # make folder for source code
     New-SourceCodeFolder
