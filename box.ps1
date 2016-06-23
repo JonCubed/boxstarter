@@ -89,7 +89,7 @@ function Install-WebPackage {
     {
         $filename = Split-Path $url -Leaf
     }
-    
+
     $fullFilename = Join-Path $downloadFolder $filename
 
     if (test-path $fullFilename) {
@@ -140,7 +140,6 @@ function Install-SqlServer
 	    $env:choco:sqlserver2008:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
 	    $env:choco:sqlserver2008:SQLSVCACCOUNT="NT AUTHORITY\SYSTEM"
 	    $env:choco:sqlserver2008:INSTALLSQLDATADIR=$dataPath
-        $env:choco:sqlserver2008:SECURITYMODE="SQL"                 # mixed mode auth
 	    choco install sqlserver2008 --source=$sqlPackageSource
     }
 
@@ -154,7 +153,6 @@ function Install-SqlServer
 	    $env:choco:sqlserver2012:AGTSVCACCOUNT="NT Service\SQLAgent`$SQL2012"
 	    $env:choco:sqlserver2012:SQLSVCACCOUNT="NT Service\MSSQL`$SQL2012"
 	    $env:choco:sqlserver2012:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
-        $env:choco:sqlserver2012:SECURITYMODE="SQL"                 # mixed mode auth
 	    choco install sqlserver2012 --source=$sqlPackageSource
     }
 
@@ -168,7 +166,6 @@ function Install-SqlServer
 		$env:choco:sqlserver2016:AGTSVCACCOUNT="NT Service\SQLAgent`$SQL2016"
 		$env:choco:sqlserver2016:SQLSVCACCOUNT="NT Service\MSSQL`$SQL2016"
 		$env:choco:sqlserver2016:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
-        $env:choco:sqlserver2016:SECURITYMODE="SQL"                 # mixed mode auth
 		choco install sqlserver2016 --source=$sqlPackageSource
     }
 }
@@ -217,7 +214,7 @@ function Install-VisualStudio
     )
 
     # install visual studio 2015 community and extensions
-    choco install visualstudio2015community -packageParameters "--Features SQL" --limitoutput
+    choco install visualstudio2015community -packageParameters "--Features SQLV1,VSUV2PreReqV1" --limitoutput
 
     Install-ChocolateyVsixPackage 'PowerShell Tools for Visual Studio 2015' https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597/file/199313/1/PowerShellTools.14.0.vsix
 	Install-ChocolateyVsixPackage 'Productivity Power Tools 2015' https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d/file/169971/1/ProPowerTools.vsix
