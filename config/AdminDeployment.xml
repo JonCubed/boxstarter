@@ -23,10 +23,10 @@
     <SelectableItemCustomization Id="ToolsForWin81_WP80_WP81V1" Hidden="no" Selected="no" FriendlyName="Tools and Windows SDKs" />
     <SelectableItemCustomization Id="GitForWindowsx64V5" Hidden="no" Selected="no" FriendlyName="Git for Windows" />
     <SelectableItemCustomization Id="GitForWindowsx86V5" Hidden="no" Selected="no" FriendlyName="Git for Windows" />
-    <SelectableItemCustomization Id="GitHubVSV1" Hidden="no" Selected="yes" FriendlyName="GitHub Extension for Visual Studio" />
+    <SelectableItemCustomization Id="GitHubVSV1" Hidden="no" Selected="no" FriendlyName="GitHub Extension for Visual Studio" />
     <SelectableItemCustomization Id="VS_SDK_GroupV5" Hidden="no" Selected="no" FriendlyName="Visual Studio Extensibility Tools Update 3" />
     <SelectableItemCustomization Id="VS_SDK_Breadcrumb_GroupV5" Selected="no" FriendlyName="Visual Studio Extensibility Tools Update 3" />
-    <SelectableItemCustomization Id="Win10_VSToolsV12" Hidden="no" Selected="noyes" FriendlyName="Tools for Universal Windows Apps (1.4) and Windows 10 SDK (10.0.10586)" />
+    <SelectableItemCustomization Id="Win10_VSToolsV12" Hidden="no" Selected="no" FriendlyName="Tools for Universal Windows Apps (1.4) and Windows 10 SDK (10.0.10586)" />
     <SelectableItemCustomization Id="Win10SDK_HiddenV3" Selected="yes" FriendlyName="Windows 10 SDK (10.0.10586)" />
     <SelectableItemCustomization Id="JavaScript_HiddenV1" Selected="yes" FriendlyName="JavaScript Project System for Visual Studio" />
     <SelectableItemCustomization Id="JavaScript_HiddenV11" Selected="yes" FriendlyName="JavaScript Project System for Visual Studio" />
