@@ -160,7 +160,6 @@ function Install-WebPackage {
 
 function Install-CoreApps
 {
-    choco install firefox                   --limitoutput
     choco install googlechrome              --limitoutput
     choco install flashplayerplugin         --limitoutput
     choco install notepadplusplus.install   --limitoutput
@@ -204,7 +203,8 @@ function Install-SqlServer
 
 function Install-CoreDevApps
 {
-    choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput
+    choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput    
+    choco install firefox                   --limitoutput
     choco install poshgit                   --limitoutput
     choco install resharper            	    --limitoutput
     choco install sourcetree 	            --limitoutput
@@ -245,9 +245,8 @@ function Install-VisualStudio
     )
 
     # install visual studio 2015 community and extensions
-    choco install visualstudio2015community -version 2015.03.01  --limitoutput # -packageParameters "--AdminFile https://raw.githubusercontent.com/JonCubed/boxstarter/master/config/AdminDeployment.xml"
+    choco install visualstudio2015community --limitoutput # -packageParameters "--AdminFile https://raw.githubusercontent.com/JonCubed/boxstarter/master/config/AdminDeployment.xml"
 
-    
     $VSCheckpoint = 'VSExtensions'
     $VSDone = Get-Checkpoint -CheckpointName $VSCheckpoint
     
@@ -553,7 +552,8 @@ if (Test-Path env:\BoxStarter:InstallDev)
 	Write-BoxstarterMessage "Installing dev apps"
 	Install-SqlServer -InstallDrive $dataDrive
    	Install-VisualStudio -DownloadFolder $tempInstallFolder
-    Install-InternetInformationServices	Install-CoreDevApps
+    Install-InternetInformationServices	
+    Install-CoreDevApps
 	Install-DevTools  -DownloadFolder $tempInstallFolder
 
     # make folder for source code
