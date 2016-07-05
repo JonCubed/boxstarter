@@ -22,12 +22,6 @@
 	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Process") # for right now
 
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2008:isoImage", "D:\Downloads\en_sql_server_2008_r2_developer_x86_x64_ia64_dvd_522665.iso", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2008:isoImage", "D:\Downloads\en_sql_server_2008_r2_developer_x86_x64_ia64_dvd_522665.iso", "Process") # for right now
-
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2012:isoImage", "D:\Downloads\en_sql_server_2012_developer_edition_with_service_pack_3_x64_dvd_7286643.iso", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2012:isoImage", "D:\Downloads\en_sql_server_2012_developer_edition_with_service_pack_3_x64_dvd_7286643.iso", "Process") # for right now
-
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Process") # for right now
 
@@ -44,6 +38,59 @@
 $Boxstarter.RebootOk=$true
 $Boxstarter.NoPassword=$false
 $Boxstarter.AutoLogin=$true
+
+$checkpointPrefix = 'BoxStarter:Checkpoint:'
+
+function Get-CheckpointName
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $CheckpointName
+    )
+    return "$checkpointPrefix$CheckpointName"
+}
+
+function Set-Checkpoint
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $CheckpointName,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        $CheckpointValue
+    )
+
+    $key = Get-CheckpointName $CheckpointName
+    [Environment]::SetEnvironmentVariable($key, $CheckpointValue, "Machine") # for reboots
+	[Environment]::SetEnvironmentVariable($key, $CheckpointValue, "Process") # for right now
+}
+
+function Get-Checkpoint
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $CheckpointName
+    )
+
+    $key = Get-CheckpointName $CheckpointName
+	[Environment]::GetEnvironmentVariable($key, "Process")
+}
+
+function Clear-Checkpoints
+{
+    $checkpointMarkers = Get-ChildItem Env: | where { $_.name -like "$checkpointPrefix*" } | Select -ExpandProperty name
+    foreach ($checkpointMarker in $checkpointMarkers) {        
+	    [Environment]::SetEnvironmentVariable($checkpointMarker, '', "Machine")
+	    [Environment]::SetEnvironmentVariable($checkpointMarker, '', "Process")
+    }
+}
 
 function Get-SystemDrive
 {
@@ -85,6 +132,14 @@ function Install-WebPackage {
         $filename
     )
 
+    $done = Get-Checkpoint -CheckpointName $packageName
+    
+    if ($done) {
+        Write-BoxstarterMessage "$packageName already installed"
+        return
+    }
+
+
     if ([String]::IsNullOrEmpty($filename))
     {
         $filename = Split-Path $url -Leaf
@@ -99,6 +154,8 @@ function Install-WebPackage {
 
     Get-ChocolateyWebFile $packageName $fullFilename $url
     Install-ChocolateyInstallPackage $packageName $fileType $installParameters $fullFilename
+
+    Set-Checkpoint -CheckpointName $packageName -CheckpointValue 1
 }
 
 function Install-CoreApps
@@ -130,32 +187,7 @@ function Install-SqlServer
 	$sqlPackageSource = "https://www.myget.org/F/nm-chocolatey-packs/api/v2"
 
 	choco install sqlstudio --source=$sqlPackageSource
-
-    if ((Test-Path env:\choco:sqlserver2008:isoImage) -or (Test-Path env:\choco:sqlserver2008:setupFolder))
-    {
-	    if (Test-PendingReboot) { Invoke-Reboot }
-	    $env:choco:sqlserver2008:INSTANCEID="sql2008"
-	    $env:choco:sqlserver2008:INSTANCENAME="sql2008"
-	    $env:choco:sqlserver2008:AGTSVCACCOUNT="NT AUTHORITY\SYSTEM"
-	    $env:choco:sqlserver2008:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
-	    $env:choco:sqlserver2008:SQLSVCACCOUNT="NT AUTHORITY\SYSTEM"
-	    $env:choco:sqlserver2008:INSTALLSQLDATADIR=$dataPath
-	    choco install sqlserver2008 --source=$sqlPackageSource
-    }
-
-    if ((Test-Path env:\choco:sqlserver2012:isoImage) -or (Test-Path env:\choco:sqlserver2012:setupFolder))
-    {
-	    if (Test-PendingReboot) { Invoke-Reboot }
-	    $env:choco:sqlserver2012:INSTALLSQLDATADIR=$dataPath
-	    $env:choco:sqlserver2012:INSTANCEID="sql2012"
-	    $env:choco:sqlserver2012:INSTANCENAME="sql2012"
-	    $env:choco:sqlserver2012:FEATURES="SQLENGINE"
-	    $env:choco:sqlserver2012:AGTSVCACCOUNT="NT Service\SQLAgent`$SQL2012"
-	    $env:choco:sqlserver2012:SQLSVCACCOUNT="NT Service\MSSQL`$SQL2012"
-	    $env:choco:sqlserver2012:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
-	    choco install sqlserver2012 --source=$sqlPackageSource
-    }
-
+    
     if ((Test-Path env:\choco:sqlserver2016:isoImage) -or (Test-Path env:\choco:sqlserver2016:setupFolder))
     {
 		# Note: No support for Windows 7 https://msdn.microsoft.com/en-us/library/ms143506.aspx
@@ -172,19 +204,18 @@ function Install-SqlServer
 
 function Install-CoreDevApps
 {
+    choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput
     choco install poshgit                   --limitoutput
     choco install resharper            	    --limitoutput
-	choco install sourcetree 			    --limitoutput
-	choco install dotpeek             	    --limitoutput
+    choco install sourcetree 	            --limitoutput
+    choco install dotpeek             	    --limitoutput
     choco install nodejs                    --limitoutput
     choco install teamviewer                --limitoutput
     choco install prefix               	    --limitoutput
     choco install commandwindowhere   	    --limitoutput
-	choco install virtualbox          	    --limitoutput
-	choco install nuget.commandline		    --limitoutput
+    choco install virtualbox          	    --limitoutput
+    choco install nuget.commandline		    --limitoutput
 	choco install rdcman 				    --limitoutput
-
-	choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput
 }
 
 function Install-DevTools
@@ -204,7 +235,7 @@ function Install-DevTools
 	choco install nugetpackageexplorer	    --limitoutput
 	choco install diffmerge				    --limitoutput
 
-    Install-WebPackage 'Docker Toolbox' 'exe' '/SILENT /COMPONENTS="Docker,DockerMachine,DockerCompose,VirtualBox,Kitematic" /TASKS="modifypath"' $DownloadFolder https://github.com/docker/toolbox/releases/download/v1.11.2/DockerToolbox-1.11.2.exe
+    #Install-WebPackage 'Docker Toolbox' 'exe' '/SILENT /COMPONENTS="Docker,DockerMachine,DockerCompose,VirtualBox,Kitematic" /TASKS="modifypath"' $DownloadFolder https://github.com/docker/toolbox/releases/download/v1.11.2/DockerToolbox-1.11.2.exe
 }
 
 function Install-VisualStudio
@@ -214,41 +245,70 @@ function Install-VisualStudio
     )
 
     # install visual studio 2015 community and extensions
-    choco install visualstudio2015community -packageParameters "--Features SQLV1,VSUV2PreReqV1" --limitoutput
+    choco install visualstudio2015community -version 2015.03.01  --limitoutput # -packageParameters "--AdminFile https://raw.githubusercontent.com/JonCubed/boxstarter/master/config/AdminDeployment.xml"
 
-    Install-ChocolateyVsixPackage 'PowerShell Tools for Visual Studio 2015' https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597/file/199313/1/PowerShellTools.14.0.vsix
-	Install-ChocolateyVsixPackage 'Productivity Power Tools 2015' https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d/file/169971/1/ProPowerTools.vsix
-    Install-ChocolateyVsixPackage 'SideWaffle Template Pack' https://visualstudiogallery.msdn.microsoft.com/a16c2d07-b2e1-4a25-87d9-194f04e7a698/referral/110630
-    Install-ChocolateyVsixPackage 'Glyphfriend' https://visualstudiogallery.msdn.microsoft.com/5fd24afb-b3b2-4cec-9b03-1cfcec6123aa/file/150806/7/Glyphfriend.vsix
-    Install-ChocolateyVsixPackage 'Web Compiler' https://visualstudiogallery.msdn.microsoft.com/3b329021-cd7a-4a01-86fc-714c2d05bb6c/file/164873/35/Web%20Compiler%20v1.10.300.vsix
-    Install-ChocolateyVsixPackage 'Image Optimizer' https://visualstudiogallery.msdn.microsoft.com/a56eddd3-d79b-48ac-8c8f-2db06ade77c3/file/38601/34/Image%20Optimizer%20v3.3.51.vsix
-    Install-ChocolateyVsixPackage 'Package Installer' https://visualstudiogallery.msdn.microsoft.com/753b9720-1638-4f9a-ad8d-2c45a410fd74/file/173807/20/Package%20Installer%20v1.5.69.vsix
-    #Install-ChocolateyVsixPackage 'PostSharp' https://visualstudiogallery.msdn.microsoft.com/a058d5d3-e654-43f8-a308-c3bdfdd0be4a/file/89212/88/PostSharp-4.2.27.exe  # installation errors
-    Install-ChocolateyVsixPackage 'BuildVision' https://visualstudiogallery.msdn.microsoft.com/23d3c821-ca2d-4e1a-a005-4f70f12f77ba/file/95980/13/BuildVision.vsix
-    Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/32/File%20Nesting%20v2.5.62.vsix
+    
+    $VSCheckpoint = 'VSExtensions'
+    $VSDone = Get-Checkpoint -CheckpointName $VSCheckpoint
+    
+    if (-not $VSDone) 
+    {
+        Install-ChocolateyVsixPackage 'PowerShell Tools for Visual Studio 2015' https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597/file/199313/1/PowerShellTools.14.0.vsix
+        Install-ChocolateyVsixPackage 'Productivity Power Tools 2015' https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d/file/169971/1/ProPowerTools.vsix
+        Install-ChocolateyVsixPackage 'SideWaffle Template Pack' https://visualstudiogallery.msdn.microsoft.com/a16c2d07-b2e1-4a25-87d9-194f04e7a698/referral/110630
+        Install-ChocolateyVsixPackage 'Glyphfriend' https://visualstudiogallery.msdn.microsoft.com/5fd24afb-b3b2-4cec-9b03-1cfcec6123aa/file/150806/7/Glyphfriend.vsix
+        Install-ChocolateyVsixPackage 'Web Compiler' https://visualstudiogallery.msdn.microsoft.com/3b329021-cd7a-4a01-86fc-714c2d05bb6c/file/164873/35/Web%20Compiler%20v1.10.300.vsix
+        Install-ChocolateyVsixPackage 'Image Optimizer' https://visualstudiogallery.msdn.microsoft.com/a56eddd3-d79b-48ac-8c8f-2db06ade77c3/file/38601/34/Image%20Optimizer%20v3.3.51.vsix
+        Install-ChocolateyVsixPackage 'Package Installer' https://visualstudiogallery.msdn.microsoft.com/753b9720-1638-4f9a-ad8d-2c45a410fd74/file/173807/20/Package%20Installer%20v1.5.69.vsix
+        Install-ChocolateyVsixPackage 'BuildVision' https://visualstudiogallery.msdn.microsoft.com/23d3c821-ca2d-4e1a-a005-4f70f12f77ba/file/95980/13/BuildVision.vsix
+        Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/32/File%20Nesting%20v2.5.62.vsix
+
+        Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 'DotNetCore.1.0.0.RC2-VS2015Tools.Preview1.exe' # for visual studio
+        
+        Set-Checkpoint -CheckpointName $VSCheckpoint -CheckpointValue 1
+    }
 
     # install visual studio code and extensions
     choco install visualstudiocode	--limitoutput
 
     Update-Path
 
-    code --install-extension ms-vscode.csharp
-    code --install-extension ms-vscode.PowerShell
-    code --install-extension DavidAnson.vscode-markdownlint
-    code --install-extension johnpapa.Angular2
-    code --install-extension donjayamanne.githistory
-    code --install-extension eg2.tslint
-    code --install-extension lukehoban.Go
-    code --install-extension msjsdiag.debugger-for-chrome
-    code --install-extension WallabyJs.wallaby-vscode
+    $VSCodeCheckpoint = 'VSCodeExtensions'
+    $VSCodeDone = Get-Checkpoint -CheckpointName $VSCodeCheckpoint
+    
+    if (-not $VSCodeDone) 
+    {
+        # need to launch vscode so user folders are created as we can install extensions
+        Start-Process code
+        Start-Sleep -s 10
+        
+        code --install-extension ms-vscode.csharp
+        code --install-extension ms-vscode.PowerShell
+        code --install-extension DavidAnson.vscode-markdownlint
+        code --install-extension johnpapa.Angular2
+        code --install-extension donjayamanne.githistory
+        code --install-extension eg2.tslint
+        code --install-extension lukehoban.Go
+        code --install-extension msjsdiag.debugger-for-chrome
+        code --install-extension WallabyJs.wallaby-vscode
+        
+        Set-Checkpoint -CheckpointName $VSCodeCheckpoint -CheckpointValue 1
+    }    
 
     # install .NET Core
-    Install-WebPackage '.NET Core Cli' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 'DotNetCore.1.0.0.RC2-SDK.Preview1-x64.exe' # cli
-    Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 'DotNetCore.1.0.0.RC2-VS2015Tools.Preview1.exe' # for visual studio
+    #Install-WebPackage '.NET Core Cli' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 'DotNetCore.1.0.0.RC2-SDK.Preview1-x64.exe' # cli
 }
 
 function Install-InternetInformationServices
 {
+    $checkpoint = 'InternetInformationServices'
+    $done = Get-Checkpoint -CheckpointName $Checkpoint
+    
+    if ($done) {        
+        Write-BoxstarterMessage "IIS features are already installed"
+        return
+    }
+
     # Enable Internet Information Services Feature - will enable a bunch of things by default
 	choco install IIS-WebServerRole                 --source windowsfeatures --limitoutput
 
@@ -285,21 +345,44 @@ function Install-InternetInformationServices
     {
         choco install IIS-WindowsAuthentication     --source windowsfeatures --limitoutput
     }
+
+    Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
 function Install-NpmPackages
 {
+    $checkpoint = 'NpmPackages'
+    $done = Get-Checkpoint -CheckpointName $checkpoint
+    
+    if ($done) {
+        Write-BoxstarterMessage "NPM packages are already installed"
+        return
+    }
+
     npm install -g angular-cli # angular2 cli
     npm install -g typings
     npm install -g jspm
+
+    Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
 function Install-PowerShellModules
 {
+    $checkpoint = 'PowerShellModules'
+    $done = Get-Checkpoint -CheckpointName $checkpoint
+    
+    if ($done) {
+        Write-BoxstarterMessage "PowerShell modules are already installed"
+        return
+    }
+
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Trusted'
     Install-Module -Name Carbon
     Install-Module -Name PowerShellHumanizer
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Untrusted'
+
+    Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
 function Set-ChocoCoreAppPins
@@ -319,7 +402,15 @@ function Set-ChocoDevAppPins
 }
 
 function Set-BaseSettings
-{
+{    
+    $checkpoint = 'BaseSettings'
+    $done = Get-Checkpoint -CheckpointName $Checkpoint
+    
+    if ($done) {
+        Write-BoxstarterMessage "Base settings are already configured"
+        return
+    }
+
 	Update-ExecutionPolicy -Policy Unrestricted
 
     $sytemDrive = Get-SystemDrive
@@ -332,6 +423,8 @@ function Set-BaseSettings
 
     # Disable hibernate
 	Start-Process 'powercfg.exe' -Verb runAs -ArgumentList '/h off'
+
+    Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
 function Set-BaseDesktopSettings
@@ -360,6 +453,14 @@ function Move-WindowsLibrary {
 
 function Set-RegionalSettings
 {
+    $checkpoint = 'RegionalSettings'
+    $done = Get-Checkpoint -CheckpointName $checkpoint
+    
+    if ($done) {
+        Write-BoxstarterMessage "Regonal settings are already configured"
+        return
+    }
+
 	#http://stackoverflow.com/questions/4235243/how-to-set-timezone-using-powershell
 	&"$env:windir\system32\tzutil.exe" /s "AUS Eastern Standard Time"
 
@@ -368,6 +469,8 @@ function Set-RegionalSettings
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortTime -Value 'hh:mm tt'
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sTimeFormat -Value 'hh:mm:ss tt'
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sLanguage -Value ENA
+    
+    Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
 function Set-UserSettings
@@ -449,9 +552,8 @@ if (Test-Path env:\BoxStarter:InstallDev)
 {
 	Write-BoxstarterMessage "Installing dev apps"
 	Install-SqlServer -InstallDrive $dataDrive
-    Install-VisualStudio -DownloadFolder $tempInstallFolder
-    Install-InternetInformationServices
-	Install-CoreDevApps
+   	Install-VisualStudio -DownloadFolder $tempInstallFolder
+    Install-InternetInformationServices	Install-CoreDevApps
 	Install-DevTools  -DownloadFolder $tempInstallFolder
 
     # make folder for source code
@@ -469,7 +571,15 @@ if (Test-Path env:\BoxStarter:InstallHome)
 }
 
 if (Get-SystemDrive -ne $dataDriveLetter)
-{
+{    
+    $checkpoint = 'MoveLibraries'
+    $done = Get-Checkpoint -CheckpointName $checkpoint
+    
+    if ($done) {
+        Write-BoxstarterMessage "Libraries are already configured"
+        return
+    }
+
     Write-BoxstarterMessage "Configuring $dataDrive\"
 
     Set-Volume -DriveLetter $dataDriveLetter -NewFileSystemLabel "Data"
@@ -483,6 +593,8 @@ if (Get-SystemDrive -ne $dataDriveLetter)
     Move-WindowsLibrary -libraryName "My Video"    -newPath (Join-Path $mediaPath "Videos")
     Move-WindowsLibrary -libraryName "My Music"    -newPath (Join-Path $mediaPath "Music")
     Move-WindowsLibrary -libraryName "Downloads"   -newPath "$dataDrive\Downloads"
+    
+    Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
 # re-enable chocolatey default confirmation behaviour
@@ -495,8 +607,13 @@ Update-Path
 
 Install-NpmPackages
 
+Install-PowerShellModules
+
+# set HOME to user profile for git
 [Environment]::SetEnvironmentVariable("HOME", $env:UserProfile, "User")
 
 # rerun windows update after we have installed everything
 Write-BoxstarterMessage "Windows update..."
 Install-WindowsUpdate
+
+Clear-Checkpoints

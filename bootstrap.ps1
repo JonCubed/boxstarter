@@ -19,18 +19,6 @@ param
     $EnableWindowsAuthFeature,
 
     [String]
-    $SqlServer2008IsoImage,
-
-    [String]
-    $SqlServer2008SaPassword,
-
-    [String]
-    $SqlServer2012IsoImage,
-
-    [String]
-    $SqlServer2012SaPassword,
-
-    [String]
     $SqlServer2016IsoImage,
 
     [String]
@@ -85,28 +73,6 @@ if ($EnableWindowsAuthFeature)
     Set-EnvironmentVariable -Key "BoxStarter:EnableWindowsAuthFeature" -Value "1"
 }
 
-if ($SqlServer2008IsoImage)
-{
-    Set-EnvironmentVariable -Key "choco:sqlserver2008:isoImage" -Value $SqlServer2008IsoImage
-
-    if ($SqlServer2008SaPassword) {
-        # enable mixed mode auth
-        $env:choco:sqlserver2008:SECURITYMODE="SQL"
-        $env:choco:sqlserver2008:SAPWD=$SqlServer2008SaPassword
-    }
-}
-
-if ($SqlServer2012IsoImage)
-{
-    Set-EnvironmentVariable -Key "choco:sqlserver2012:isoImage" -Value $SqlServer2012IsoImage
-
-    if ($SqlServer2012SaPassword) {
-        # enable mixed mode auth
-        $env:choco:sqlserver2012:SECURITYMODE="SQL"
-        $env:choco:sqlserver2012:SAPWD=$SqlServer2012SaPassword
-    }
-}
-
 if ($SqlServer2016IsoImage)
 {
     Set-EnvironmentVariable -Key "choco:sqlserver2016:isoImage" -Value $SqlServer2016IsoImage
@@ -132,4 +98,3 @@ else
     $IE.navigate2($webLauncherUrl)
     $IE.visible=$true
 }
-

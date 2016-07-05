@@ -16,8 +16,7 @@ The Bootstrapper method is the recommended way to run this script. Simply open a
 console and run the following command
 
 ```powershell
-> $tempPath='c:\temp';New-Item -ItemType Directory -Force -Path $tempPath;wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' 
--OutFile "$tempPath\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$tempPath\bootstrap.ps1" <arguments> }
+> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" <arguments> }
 ```
 
 You can remove *&lt;arguments&gt;* or replace it with one or more argument lists below
@@ -30,8 +29,6 @@ You can remove *&lt;arguments&gt;* or replace it with one or more argument lists
 |DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
 |SourceCodeFolder|String|InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
 |EnableWindowsAuthFeature|Switch|InstallDev|Enable Windows Authentication in IIS|
-|SqlServer2008IsoImage|String|InstallDev|Absolute path to Sq Server 2008 ISO|
-|SqlServer2012IsoImage|String|InstallDev|Absolute path to Sq Server 2012 ISO|
 |SqlServer2016IsoImage|String|InstallDev|Absolute path to Sq Server 2016 ISO|
 
 #### Examples
@@ -70,30 +67,28 @@ If you want more control over what is happening you can manually run the script.
 
 1. You must first setup environment keys for the features you would like to install.
 
-|Key|Value|Requires|Value Description|
-|--------|----|--------|-----------------|
-|BoxStarter:InstallDev|1||Configures machine for development and install development apps|
-|BoxStarter:InstallHome|1||Configures machine for home and install home apps|
-|BoxStarter:SkipWindowsUpdate|1||Skips running windows update|
-|BoxStarter:DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
-|BoxStarter:SourceCodeFolder|String|BoxStarter:InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
-|BoxStarter:EnableWindowsAuthFeature|1|BoxStarter:InstallDev|Enable Windows Authentication in IIS|
-|choco:sqlserver2008:isoImage|String|BoxStarter:InstallDev|Absolute path to Sq Server 2008 ISO|
-|choco:sqlserver2012:isoImage|String|BoxStarter:InstallDev|Absolute path to Sq Server 2012 ISO|
-|choco:sqlserver2016:isoImage|String|BoxStarter:InstallDev|Absolute path to Sq Server 2016 ISO|
+    |Key|Value|Requires|Value Description|
+    |--------|----|--------|-----------------|
+    |BoxStarter:InstallDev|1||Configures machine for development and install development apps|
+    |BoxStarter:InstallHome|1||Configures machine for home and install home apps|
+    |BoxStarter:SkipWindowsUpdate|1||Skips running windows update|
+    |BoxStarter:DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
+    |BoxStarter:SourceCodeFolder|String|BoxStarter:InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
+    |BoxStarter:EnableWindowsAuthFeature|1|BoxStarter:InstallDev|Enable Windows Authentication in IIS|
+    |choco:sqlserver2016:isoImage|String|BoxStarter:InstallDev|Absolute path to Sq Server 2016 ISO|
 
-> Environment variables must be added to *Machine* and *Process* scopes
+    > Environment variables must be added to *Machine* and *Process* scopes
 
-2. Run the following command
+1. Run the following command
 
     * In Command prompt or Powershell
-    
+
     ```powershell
     > START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
     ```
 
-    * In Edge Or Internet Explorer, go to
-    
-    ```
+  * In Edge Or Internet Explorer, go to
+
+    ```http
     http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
     ```
