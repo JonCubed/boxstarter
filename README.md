@@ -35,31 +35,29 @@ You can remove *&lt;arguments&gt;* or replace it with one or more argument lists
 
 1. Setup a development box without windows update
 
-    ```powershell
-    > $tempPath='c:\temp';New-Item -ItemType Directory -Force -Path $tempPath;wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1'
-    -OutFile "$tempPath\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$tempPath\bootstrap.ps1" -InstallDev -SkipWindowsUpdate }
-    ```
+```powershell
+> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SkipWindowsUpdate }
+```
 
 1. Setup a development box, move windows libraries and source code folder to another drive
 
-    ```powershell
-    > $tempPath='c:\temp';New-Item -ItemType Directory -Force -Path $tempPath;wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1'
-    -OutFile "$tempPath\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$tempPath\bootstrap.ps1" -InstallDev -DataDrive 'D' -SourceCodeFolder '/source' }
-    ```
+```powershell
+> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -DataDrive 'D' -SourceCodeFolder '/source' }
+```
 
 1. Setup a development box with sql server
 
-    ```powershell
-    > $tempPath='c:\temp';New-Item -ItemType Directory -Force -Path $tempPath;wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1'
-    -OutFile "$tempPath\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$tempPath\bootstrap.ps1" -InstallDev -SqlServer2016IsoImage 'D:/temp/en_sql_server_2016_developer_x64_dvd_8777069.iso' }
-    ```
+```powershell
+> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SqlServer2016IsoImage 'D:/temp/en_sql_server_2016_developer_x64_dvd_8777069.iso' }
+```
+
 
 1. Setup a home box
 
-    ```powershell
-    > $tempPath='c:\temp';New-Item -ItemType Directory -Force -Path $tempPath;wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1'
-    -OutFile "$tempPath\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$tempPath\bootstrap.ps1" -InstallHome }
-    ```
+```powershell
+> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallHome }
+```
+
 
 ### Manual
 
