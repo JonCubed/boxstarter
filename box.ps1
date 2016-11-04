@@ -161,6 +161,10 @@ function Install-WebPackage {
 function Install-CoreApps
 {
     choco install chocolatey                --limitoutput
+
+    RefreshEnv
+    choco feature enable --name=allowEmptyChecksums
+
     choco install googlechrome              --limitoutput
     choco install flashplayerplugin         --limitoutput
     choco install notepadplusplus.install   --limitoutput
