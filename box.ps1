@@ -619,6 +619,9 @@ if (Get-SystemDrive -ne $dataDriveLetter)
     Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
+# install chocolatey as last choco package
+choco install chocolatey --limitoutput
+
 # re-enable chocolatey default confirmation behaviour
 choco feature disable --name=allowGlobalConfirmation
 
@@ -630,9 +633,6 @@ Update-Path
 Install-NpmPackages
 
 Install-PowerShellModules
-
-# install chocolatey as last thing
-choco install chocolatey                --limitoutput
 
 # set HOME to user profile for git
 [Environment]::SetEnvironmentVariable("HOME", $env:UserProfile, "User")
