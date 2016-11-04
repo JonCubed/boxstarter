@@ -551,6 +551,7 @@ Install-WindowsUpdate
 
 # disable chocolatey default confirmation behaviour (no need for --yes)
 choco feature enable --name=allowGlobalConfirmation
+choco feature enable --name=allowEmptyChecksums
 
 Set-BaseSettings
 Set-UserSettings
@@ -617,6 +618,7 @@ if (Get-SystemDrive -ne $dataDriveLetter)
 
 # re-enable chocolatey default confirmation behaviour
 choco feature disable --name=allowGlobalConfirmation
+choco feature disable --name=allowEmptyChecksums
 
 if (Test-PendingReboot) { Invoke-Reboot }
 
