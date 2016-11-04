@@ -59,7 +59,7 @@ function Set-Checkpoint
         [Parameter(Mandatory=$true)]
         [string]
         $CheckpointName,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         $CheckpointValue
@@ -86,7 +86,7 @@ function Get-Checkpoint
 function Clear-Checkpoints
 {
     $checkpointMarkers = Get-ChildItem Env: | where { $_.name -like "$checkpointPrefix*" } | Select -ExpandProperty name
-    foreach ($checkpointMarker in $checkpointMarkers) {        
+    foreach ($checkpointMarker in $checkpointMarkers) {
 	    [Environment]::SetEnvironmentVariable($checkpointMarker, '', "Machine")
 	    [Environment]::SetEnvironmentVariable($checkpointMarker, '', "Process")
     }
@@ -133,7 +133,7 @@ function Install-WebPackage {
     )
 
     $done = Get-Checkpoint -CheckpointName $packageName
-    
+
     if ($done) {
         Write-BoxstarterMessage "$packageName already installed"
         return
@@ -160,6 +160,7 @@ function Install-WebPackage {
 
 function Install-CoreApps
 {
+    choco install chocolatey                --limitoutput
     choco install googlechrome              --limitoutput
     choco install flashplayerplugin         --limitoutput
     choco install notepadplusplus.install   --limitoutput
@@ -186,7 +187,7 @@ function Install-SqlServer
 	$sqlPackageSource = "https://www.myget.org/F/nm-chocolatey-packs/api/v2"
 
 	choco install sqlstudio --source=$sqlPackageSource
-    
+
     if ((Test-Path env:\choco:sqlserver2016:isoImage) -or (Test-Path env:\choco:sqlserver2016:setupFolder))
     {
 		# Note: No support for Windows 7 https://msdn.microsoft.com/en-us/library/ms143506.aspx
@@ -203,11 +204,12 @@ function Install-SqlServer
 
 function Install-CoreDevApps
 {
-    choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput    
+    choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput
     choco install firefox                   --limitoutput
     choco install poshgit                   --limitoutput
     choco install resharper            	    --limitoutput
     choco install sourcetree 	            --limitoutput
+    choco install gitkraken 	            --limitoutput
     choco install dotpeek             	    --limitoutput
     choco install nodejs                    --limitoutput
     choco install teamviewer                --limitoutput
@@ -228,6 +230,7 @@ function Install-DevTools
     choco install slack                     --limitoutput
     choco install redis-desktop-manager     --limitoutput
     choco install packer               	    --limitoutput
+    choco install terraform           	    --limitoutput
 	choco install putty               	    --limitoutput
     choco install fiddler4               	--limitoutput
 	choco install winscp              	    --limitoutput
@@ -249,8 +252,8 @@ function Install-VisualStudio
 
     $VSCheckpoint = 'VSExtensions'
     $VSDone = Get-Checkpoint -CheckpointName $VSCheckpoint
-    
-    if (-not $VSDone) 
+
+    if (-not $VSDone)
     {
         Install-ChocolateyVsixPackage 'PowerShell Tools for Visual Studio 2015' https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597/file/199313/1/PowerShellTools.14.0.vsix
         Install-ChocolateyVsixPackage 'Productivity Power Tools 2015' https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d/file/169971/1/ProPowerTools.vsix
@@ -262,25 +265,25 @@ function Install-VisualStudio
         Install-ChocolateyVsixPackage 'BuildVision' https://visualstudiogallery.msdn.microsoft.com/23d3c821-ca2d-4e1a-a005-4f70f12f77ba/file/95980/13/BuildVision.vsix
         Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/32/File%20Nesting%20v2.5.62.vsix
 
-        Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkId=798481 'DotNetCore.1.0.0.RC2-VS2015Tools.Preview1.exe' # for visual studio
-        
+        Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=827546 'DotNetCore.1.0.1-VS2015Tools.Preview2.0.2.exe' # for visual studio
+
         Set-Checkpoint -CheckpointName $VSCheckpoint -CheckpointValue 1
     }
 
     # install visual studio code and extensions
     choco install visualstudiocode	--limitoutput
 
-    Update-Path
+    refreshenv
 
     $VSCodeCheckpoint = 'VSCodeExtensions'
     $VSCodeDone = Get-Checkpoint -CheckpointName $VSCodeCheckpoint
-    
-    if (-not $VSCodeDone) 
+
+    if (-not $VSCodeDone)
     {
         # need to launch vscode so user folders are created as we can install extensions
         Start-Process code
         Start-Sleep -s 10
-        
+
         code --install-extension ms-vscode.csharp
         code --install-extension ms-vscode.PowerShell
         code --install-extension DavidAnson.vscode-markdownlint
@@ -289,10 +292,11 @@ function Install-VisualStudio
         code --install-extension eg2.tslint
         code --install-extension lukehoban.Go
         code --install-extension msjsdiag.debugger-for-chrome
-        code --install-extension WallabyJs.wallaby-vscode
-        
+        code --install-extension cake-build.cake-vscode
+        code --install-extension mauve.terraform
+
         Set-Checkpoint -CheckpointName $VSCodeCheckpoint -CheckpointValue 1
-    }    
+    }
 
     # install .NET Core
     #Install-WebPackage '.NET Core Cli' 'exe' '/quiet' $DownloadFolder https://go.microsoft.com/fwlink/?LinkID=798398 'DotNetCore.1.0.0.RC2-SDK.Preview1-x64.exe' # cli
@@ -302,8 +306,8 @@ function Install-InternetInformationServices
 {
     $checkpoint = 'InternetInformationServices'
     $done = Get-Checkpoint -CheckpointName $Checkpoint
-    
-    if ($done) {        
+
+    if ($done) {
         Write-BoxstarterMessage "IIS features are already installed"
         return
     }
@@ -348,18 +352,35 @@ function Install-InternetInformationServices
     Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
+function Install-DevFeatures
+{
+    # Bash for windows
+    $features = choco list --source windowsfeatures
+    if ($features | Where-Object {$_ -like "*Linux*"})
+    {
+        choco install Microsoft-Windows-Subsystem-Linux           --source windowsfeatures --limitoutput
+    }
+
+    # windows containers
+    Enable-WindowsOptionalFeature -Online -FeatureName containers -All
+
+    # hyper-v (required for windows containers)
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+
+}
+
 function Install-NpmPackages
 {
     $checkpoint = 'NpmPackages'
     $done = Get-Checkpoint -CheckpointName $checkpoint
-    
+
     if ($done) {
         Write-BoxstarterMessage "NPM packages are already installed"
         return
     }
 
+    npm install -g typescript
     npm install -g angular-cli # angular2 cli
-    npm install -g typings
     npm install -g jspm
 
     Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
@@ -369,7 +390,7 @@ function Install-PowerShellModules
 {
     $checkpoint = 'PowerShellModules'
     $done = Get-Checkpoint -CheckpointName $checkpoint
-    
+
     if ($done) {
         Write-BoxstarterMessage "PowerShell modules are already installed"
         return
@@ -398,13 +419,14 @@ function Set-ChocoDevAppPins
     choco pin add -n=visualstudiocode
     choco pin add -n=visualstudio2015community
     choco pin add -n=sourcetree
+    choco pin add -n=gitkraken
 }
 
 function Set-BaseSettings
-{    
+{
     $checkpoint = 'BaseSettings'
     $done = Get-Checkpoint -CheckpointName $Checkpoint
-    
+
     if ($done) {
         Write-BoxstarterMessage "Base settings are already configured"
         return
@@ -454,7 +476,7 @@ function Set-RegionalSettings
 {
     $checkpoint = 'RegionalSettings'
     $done = Get-Checkpoint -CheckpointName $checkpoint
-    
+
     if ($done) {
         Write-BoxstarterMessage "Regonal settings are already configured"
         return
@@ -468,7 +490,7 @@ function Set-RegionalSettings
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortTime -Value 'hh:mm tt'
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sTimeFormat -Value 'hh:mm:ss tt'
 	Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sLanguage -Value ENA
-    
+
     Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
@@ -517,11 +539,6 @@ function New-InstallCache
     return $tempInstallFolder
 }
 
-function Update-Path
-{
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-}
-
 $dataDriveLetter = Get-DataDrive
 $dataDrive = "$dataDriveLetter`:"
 $tempInstallFolder = New-InstallCache -InstallDrive $dataDrive
@@ -552,7 +569,8 @@ if (Test-Path env:\BoxStarter:InstallDev)
 	Write-BoxstarterMessage "Installing dev apps"
 	Install-SqlServer -InstallDrive $dataDrive
    	Install-VisualStudio -DownloadFolder $tempInstallFolder
-    Install-InternetInformationServices	
+    Install-DevFeatures
+    Install-InternetInformationServices
     Install-CoreDevApps
 	Install-DevTools  -DownloadFolder $tempInstallFolder
 
@@ -571,10 +589,10 @@ if (Test-Path env:\BoxStarter:InstallHome)
 }
 
 if (Get-SystemDrive -ne $dataDriveLetter)
-{    
+{
     $checkpoint = 'MoveLibraries'
     $done = Get-Checkpoint -CheckpointName $checkpoint
-    
+
     if ($done) {
         Write-BoxstarterMessage "Libraries are already configured"
         return
@@ -593,7 +611,7 @@ if (Get-SystemDrive -ne $dataDriveLetter)
     Move-WindowsLibrary -libraryName "My Video"    -newPath (Join-Path $mediaPath "Videos")
     Move-WindowsLibrary -libraryName "My Music"    -newPath (Join-Path $mediaPath "Music")
     Move-WindowsLibrary -libraryName "Downloads"   -newPath "$dataDrive\Downloads"
-    
+
     Set-Checkpoint -CheckpointName $checkpoint -CheckpointValue 1
 }
 
@@ -603,7 +621,7 @@ choco feature disable --name=allowGlobalConfirmation
 if (Test-PendingReboot) { Invoke-Reboot }
 
 # reload path environment variable
-Update-Path
+RefreshEnv
 
 Install-NpmPackages
 
