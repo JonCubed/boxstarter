@@ -160,11 +160,6 @@ function Install-WebPackage {
 
 function Install-CoreApps
 {
-    choco install chocolatey                --limitoutput
-
-    RefreshEnv
-    choco feature enable --name=allowEmptyChecksums
-
     choco install googlechrome              --limitoutput
     choco install flashplayerplugin         --limitoutput
     choco install notepadplusplus.install   --limitoutput
@@ -277,7 +272,7 @@ function Install-VisualStudio
     # install visual studio code and extensions
     choco install visualstudiocode	--limitoutput
 
-    refreshenv
+    Update-Path
 
     $VSCodeCheckpoint = 'VSCodeExtensions'
     $VSCodeDone = Get-Checkpoint -CheckpointName $VSCodeCheckpoint
@@ -543,6 +538,11 @@ function New-InstallCache
     return $tempInstallFolder
 }
 
+function Update-Path
+{
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+}
+
 $dataDriveLetter = Get-DataDrive
 $dataDrive = "$dataDriveLetter`:"
 $tempInstallFolder = New-InstallCache -InstallDrive $dataDrive
@@ -555,7 +555,6 @@ Install-WindowsUpdate
 
 # disable chocolatey default confirmation behaviour (no need for --yes)
 choco feature enable --name=allowGlobalConfirmation
-choco feature enable --name=allowEmptyChecksums
 
 Set-BaseSettings
 Set-UserSettings
@@ -622,16 +621,18 @@ if (Get-SystemDrive -ne $dataDriveLetter)
 
 # re-enable chocolatey default confirmation behaviour
 choco feature disable --name=allowGlobalConfirmation
-choco feature disable --name=allowEmptyChecksums
 
 if (Test-PendingReboot) { Invoke-Reboot }
 
 # reload path environment variable
-RefreshEnv
+Update-Path
 
 Install-NpmPackages
 
 Install-PowerShellModules
+
+# install chocolatey as last thing
+choco install chocolatey                --limitoutput
 
 # set HOME to user profile for git
 [Environment]::SetEnvironmentVariable("HOME", $env:UserProfile, "User")
