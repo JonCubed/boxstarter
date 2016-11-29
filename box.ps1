@@ -22,6 +22,9 @@
 	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Process") # for right now
 
+	[Environment]::SetEnvironmentVariable("choco:sqlserver2014:isoImage", "D:\Downloads\en_sql_server_2014_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
+	[Environment]::SetEnvironmentVariable("choco:sqlserver2014:isoImage", "D:\Downloads\en_sql_server_2014_rc_2_x64_dvd_8509698.iso", "Process") # for right now
+
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
 	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Process") # for right now
 
@@ -118,7 +121,7 @@ function Install-WindowsUpdate
 
 	Enable-MicrosoftUpdate
 	Install-WindowsUpdate -AcceptEula
-	if (Test-PendingReboot) { Invoke-Reboot }
+	#if (Test-PendingReboot) { Invoke-Reboot }
 }
 
 function Install-WebPackage {
@@ -185,7 +188,24 @@ function Install-SqlServer
 	#rejected by chocolatey.org since iso image is required  :|
 	$sqlPackageSource = "https://www.myget.org/F/nm-chocolatey-packs/api/v2"
 
-	choco install sqlstudio --source=$sqlPackageSource
+	choco install sqlstudio --limitoutput
+
+    if ((Test-Path env:\choco:sqlserver2014:isoImage) -or (Test-Path env:\choco:sqlserver2014:setupFolder))
+    {
+		# SQL2014 has dependency on .net 3.5
+		choco install NetFx3                 --source windowsfeatures --limitoutput
+
+		# Note: No support for Windows 7 https://msdn.microsoft.com/en-us/library/ms143506.aspx
+		if (Test-PendingReboot) { Invoke-Reboot }
+		$env:choco:sqlserver2014:INSTALLSQLDATADIR=$dataPath
+		$env:choco:sqlserver2014:INSTANCEID="sql2014"
+		$env:choco:sqlserver2014:INSTANCENAME="sql2014"
+		$env:choco:sqlserver2014:FEATURES="SQLENGINE,ADV_SSMS"
+		$env:choco:sqlserver2014:AGTSVCACCOUNT="NT Service\SQLAgent`$SQL2014"
+		$env:choco:sqlserver2014:SQLSVCACCOUNT="NT Service\MSSQL`$SQL2014"
+		$env:choco:sqlserver2014:SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
+		choco install sqlserver2014 --source=$sqlPackageSource
+    }
 
     if ((Test-Path env:\choco:sqlserver2016:isoImage) -or (Test-Path env:\choco:sqlserver2016:setupFolder))
     {

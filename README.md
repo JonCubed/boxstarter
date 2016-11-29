@@ -29,7 +29,8 @@ You can remove *&lt;arguments&gt;* or replace it with one or more argument lists
 |DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
 |SourceCodeFolder|String|InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
 |EnableWindowsAuthFeature|Switch|InstallDev|Enable Windows Authentication in IIS|
-|SqlServer2016IsoImage|String|InstallDev|Absolute path to Sq Server 2016 ISO|
+|SqlServer2016IsoImage|String|InstallDev|Absolute path to Sql Server 2016 ISO|
+|SqlServer2014IsoImage|String|InstallDev|Absolute path to Sql Server 2014 ISO|
 
 #### Examples
 
@@ -45,12 +46,17 @@ You can remove *&lt;arguments&gt;* or replace it with one or more argument lists
 > wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -DataDrive 'D' -SourceCodeFolder '/source' }
 ```
 
-1. Setup a development box with sql server
+1. Setup a development box with sql server 2016
 
 ```powershell
 > wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SqlServer2016IsoImage 'D:/temp/en_sql_server_2016_developer_x64_dvd_8777069.iso' }
 ```
 
+1. Setup a development box with sql server 2014
+
+```powershell
+> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SqlServer2014IsoImage 'D:/temp/en_sql_server_2014_developer_x64_dvd_8777069.iso' }
+```
 
 1. Setup a home box
 
@@ -73,7 +79,8 @@ If you want more control over what is happening you can manually run the script.
     |BoxStarter:DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
     |BoxStarter:SourceCodeFolder|String|BoxStarter:InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
     |BoxStarter:EnableWindowsAuthFeature|1|BoxStarter:InstallDev|Enable Windows Authentication in IIS|
-    |choco:sqlserver2016:isoImage|String|BoxStarter:InstallDev|Absolute path to Sq Server 2016 ISO|
+    |choco:sqlserver2016:isoImage|String|BoxStarter:InstallDev|Absolute path to Sql Server 2016 ISO|
+    |choco:sqlserver2014:isoImage|String|BoxStarter:InstallDev|Absolute path to Sql Server 2014 ISO|
 
     > Environment variables must be added to *Machine* and *Process* scopes
 
