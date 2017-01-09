@@ -188,7 +188,7 @@ function Install-SqlServer
 	#rejected by chocolatey.org since iso image is required  :|
 	$sqlPackageSource = "https://www.myget.org/F/nm-chocolatey-packs/api/v2"
 
-	choco install sqlstudio --limitoutput
+	choco install sql-server-management-studio --limitoutput
 
     if ((Test-Path env:\choco:sqlserver2014:isoImage) -or (Test-Path env:\choco:sqlserver2014:setupFolder))
     {
