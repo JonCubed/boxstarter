@@ -107,7 +107,7 @@ $edgeVersion = Get-AppxPackage -Name Microsoft.MicrosoftEdge
 
 if ($edgeVersion)
 {
-    start microsoft-edge:$webLauncherUrl
+    Start-Process microsoft-edge:$webLauncherUrl
 }
 else
 {
