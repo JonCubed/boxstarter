@@ -278,9 +278,9 @@ function Install-SqlTools {
 
     choco install sql-server-management-studio --limitoutput
 
-    Install-WebPackageWithCheckpoint 'SQL Source Control V3.8' 'exe' '/quiet' $DownloadFolder ftp://support.red-gate.com/patches/SQLSourceControlFrequentUpdates/23Jul2015/SQLSourceControlFrequentUpdates_3.8.21.179.exe
+    #Install-WebPackageWithCheckpoint 'SQL Source Control V3.8' 'exe' '/quiet' $DownloadFolder ftp://support.red-gate.com/patches/SQLSourceControlFrequentUpdates/23Jul2015/SQLSourceControlFrequentUpdates_3.8.21.179.exe
 
-    Install-WebPackageWithCheckpoint 'SQL Compare V11.6' 'exe' '/quiet' $DownloadFolder http://download.red-gate.com/checkforupdates/SQLCompare/SQLCompare_11.6.11.2463.exe
+    #Install-WebPackageWithCheckpoint 'SQL Compare V11.6' 'exe' '/quiet' $DownloadFolder http://download.red-gate.com/checkforupdates/SQLCompare/SQLCompare_11.6.11.2463.exe
 }
 
 function Install-HomeApps {
