@@ -2,41 +2,41 @@
 
 #OPTIONAL
 
-	** Windows 7 **
-	Should upgrade to WMF 5 first for reduced errors
-	https://www.microsoft.com/en-us/download/details.aspx?id=50395
+    ** Windows 7 **
+    Should upgrade to WMF 5 first for reduced errors
+    https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
-	# If Dev Machine
-	[Environment]::SetEnvironmentVariable("BoxStarter:InstallDev", "1", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("BoxStarter:InstallDev", "1", "Process") # for right now
+    # If Dev Machine
+    [Environment]::SetEnvironmentVariable("BoxStarter:InstallDev", "1", "Machine") # for reboots
+    [Environment]::SetEnvironmentVariable("BoxStarter:InstallDev", "1", "Process") # for right now
 
     [Environment]::SetEnvironmentVariable("BoxStarter:DataDrive", "D", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("BoxStarter:DataDrive", "D", "Process") # for right now
+    [Environment]::SetEnvironmentVariable("BoxStarter:DataDrive", "D", "Process") # for right now
 
     [Environment]::SetEnvironmentVariable("BoxStarter:SourceCodeFolder", "git", "Machine") # relative path to for reboots
-	[Environment]::SetEnvironmentVariable("BoxStarter:SourceCodeFolder", "git", "Process") # for right now
+    [Environment]::SetEnvironmentVariable("BoxStarter:SourceCodeFolder", "git", "Process") # for right now
 
-	[Environment]::SetEnvironmentVariable("BoxStarter:SkipWindowsUpdate", "1", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("BoxStarter:SkipWindowsUpdate", "1", "Process") # for right now
+    [Environment]::SetEnvironmentVariable("BoxStarter:SkipWindowsUpdate", "1", "Machine") # for reboots
+    [Environment]::SetEnvironmentVariable("BoxStarter:SkipWindowsUpdate", "1", "Process") # for right now
 
-	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Process") # for right now
+    [Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Machine") # for reboots
+    [Environment]::SetEnvironmentVariable("BoxStarter:EnableWindowsAuthFeature", "1", "Process") # for right now
 
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2014:isoImage", "D:\Downloads\en_sql_server_2014_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2014:isoImage", "D:\Downloads\en_sql_server_2014_rc_2_x64_dvd_8509698.iso", "Process") # for right now
+    [Environment]::SetEnvironmentVariable("choco:sqlserver2014:isoImage", "D:\Downloads\en_sql_server_2014_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
+    [Environment]::SetEnvironmentVariable("choco:sqlserver2014:isoImage", "D:\Downloads\en_sql_server_2014_rc_2_x64_dvd_8509698.iso", "Process") # for right now
 
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Process") # for right now
+    [Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Machine") # for reboots
+    [Environment]::SetEnvironmentVariable("choco:sqlserver2016:isoImage", "D:\Downloads\en_sql_server_2016_rc_2_x64_dvd_8509698.iso", "Process") # for right now
 
 
-	# If Home Machine
-	[Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Machine") # for reboots
-	[Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Process") # for right now
+    # If Home Machine
+    [Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Machine") # for reboots
+    [Environment]::SetEnvironmentVariable("BoxStarter:InstallHome", "1", "Process") # for right now
 
 #START
-	START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
+    START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
 
-wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SkipWindowsUpdate -SqlServer2014IsoImage 'c:\sql2014\en_sql_server_2014_standard_edition_x64_dvd_3932034.iso' }
+    wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SkipWindowsUpdate -SqlServer2014IsoImage 'c:\sql2014\en_sql_server_2014_standard_edition_x64_dvd_3932034.iso' }
 #>
 
 $Boxstarter.RebootOk = $true
@@ -204,14 +204,10 @@ function Install-WebPackageWithCheckpoint {
 
 function Install-CoreApps {
     choco install googlechrome              --limitoutput
-    choco install notepadplusplus.install   --limitoutput
     choco install paint.net                 --limitoutput
     choco install 7zip.install              --limitoutput
-    choco install skype                     --limitoutput
     choco install adobereader               --limitoutput
-}
 
-function Set-ChocoCoreAppPins {
     # pin apps that update themselves
     choco pin add -n=googlechrome
     choco pin add -n='paint.net'
@@ -276,7 +272,8 @@ function Install-SqlTools {
         $DownloadFolder
     )
 
-    choco install sql-server-management-studio --limitoutput
+    choco install sql-server-management-studio  --limitoutput
+    choco install sql-operations-studio         --limitoutput
 
     #Install-WebPackageWithCheckpoint 'SQL Source Control V3.8' 'exe' '/quiet' $DownloadFolder ftp://support.red-gate.com/patches/SQLSourceControlFrequentUpdates/23Jul2015/SQLSourceControlFrequentUpdates_3.8.21.179.exe
 
@@ -288,7 +285,12 @@ function Install-HomeApps {
         return
     }
 
-    choco install lastpass	--limitoutput
+    choco install lastpass      --limitoutput
+    choco install skype         --limitoutput
+    choco install teamviewer    --limitoutput
+
+    # pin apps that update themselves
+    choco pin add -n=skype
 }
 
 function Install-CoreDevApps {
@@ -297,78 +299,77 @@ function Install-CoreDevApps {
     choco install git.install -params '"/GitAndUnixToolsOnPath"' --limitoutput
     choco install firefox                   --limitoutput
     choco install docker-for-windows        --limitoutput
-    choco install gitkraken 	            --limitoutput
+    choco install gitkraken                 --limitoutput
     choco install resharper-platform        --limitoutput
-    choco install prefix               	    --limitoutput
+    choco install prefix                    --limitoutput
     choco install nodejs                    --limitoutput
+
+    # pin apps that update themselves
+    choco pin add -n=gitkraken
+    choco pin add -n=firefox
+    choco pin add -n=docker-for-windows
+    choco pin add -n=resharper-platform
 }
 
 function Install-DevOpsTools {
-    choco install terraform           	    --limitoutput
-    choco install packer               	    --limitoutput
+    choco install terraform                 --limitoutput
+    choco install packer                    --limitoutput
 }
 
 function Install-DevTools {
-    #choco install jdk8		        	    --limitoutput
     choco install slack                     --limitoutput
     choco install redis-desktop-manager     --limitoutput
-    choco install putty               	    --limitoutput
-    choco install fiddler4               	--limitoutput
-    choco install winscp              	    --limitoutput
-    #choco install nmap                	    --limitoutput
-    choco install nugetpackageexplorer	    --limitoutput
-    choco install diffmerge				    --limitoutput
-
+    choco install fiddler4                  --limitoutput
+    choco install winscp                    --limitoutput
+    choco install nugetpackageexplorer      --limitoutput
     choco install poshgit                   --limitoutput
-    choco install sourcetree 	            --limitoutput
-    choco install teamviewer                --limitoutput
-    choco install commandwindowhere   	    --limitoutput
-    #choco install virtualbox          	    --limitoutput
-    choco install nuget.commandline		    --limitoutput
-    #choco install rdcman 				    --limitoutput
 }
 
 function Install-VisualStudio2017 {
-    # install visual studio 2017 community and extensions
-    choco install visualstudio2017community                 --limitoutput
-    choco install visualstudio2017-workload-netcoretools    --limitoutput
-    choco install visualstudio2017-workload-netweb
+    if (-not(Test-Path env:\BoxStarter:InstallVS2017Community)) {
+        return
+    }
+
+    choco install visualstudio2017community --limitoutput
+
+    choco pin add -n=visualstudio2017community
 }
 
-function Install-VisualStudio2015 {
-    # install visual studio 2015 community and extensions
-    choco install visualstudio2015community --limitoutput # -packageParameters "--AdminFile https://raw.githubusercontent.com/JonCubed/boxstarter/master/config/AdminDeployment.xml"
+function Install-VisualStudio2017Enterprise {
+    if (-not(Test-Path env:\BoxStarter:InstallVS2017Enterprise)) {
+        return
+    }
+
+    choco install visualstudio2017enterprise    --limitoutput
+
+    choco pin add -n=visualstudio2017enterprise
 }
 
-function Install-VisualStudio2015Extensions {
-    param (
-        $DownloadFolder
-    )
+function Install-VisualStudio2017Workloads {
+    if (-not(Test-Path env:\BoxStarter:InstallVS2017Community) -and -not(Test-Path env:\BoxStarter:InstallVS2017Enterprise)) {
+        return
+    }
 
-    Install-ChocolateyVsixPackage 'PowerShell Tools for Visual Studio 2015' https://visualstudiogallery.msdn.microsoft.com/c9eb3ba8-0c59-4944-9a62-6eee37294597/file/199313/1/PowerShellTools.14.0.vsix
-    Install-ChocolateyVsixPackage 'Productivity Power Tools 2015' https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d/file/169971/1/ProPowerTools.vsix
-    Install-ChocolateyVsixPackage 'SideWaffle Template Pack' https://visualstudiogallery.msdn.microsoft.com/a16c2d07-b2e1-4a25-87d9-194f04e7a698/referral/110630
-    Install-ChocolateyVsixPackage 'Glyphfriend' https://visualstudiogallery.msdn.microsoft.com/5fd24afb-b3b2-4cec-9b03-1cfcec6123aa/file/150806/7/Glyphfriend.vsix
-    Install-ChocolateyVsixPackage 'Web Compiler' https://visualstudiogallery.msdn.microsoft.com/3b329021-cd7a-4a01-86fc-714c2d05bb6c/file/164873/35/Web%20Compiler%20v1.10.300.vsix
-    Install-ChocolateyVsixPackage 'Image Optimizer' https://visualstudiogallery.msdn.microsoft.com/a56eddd3-d79b-48ac-8c8f-2db06ade77c3/file/38601/34/Image%20Optimizer%20v3.3.51.vsix
-    Install-ChocolateyVsixPackage 'Package Installer' https://visualstudiogallery.msdn.microsoft.com/753b9720-1638-4f9a-ad8d-2c45a410fd74/file/173807/20/Package%20Installer%20v1.5.69.vsix
-    Install-ChocolateyVsixPackage 'BuildVision' https://visualstudiogallery.msdn.microsoft.com/23d3c821-ca2d-4e1a-a005-4f70f12f77ba/file/95980/13/BuildVision.vsix
-    Install-ChocolateyVsixPackage 'File Nesting' https://visualstudiogallery.msdn.microsoft.com/3ebde8fb-26d8-4374-a0eb-1e4e2665070c/file/123284/32/File%20Nesting%20v2.5.62.vsix
-
-    #Install-WebPackage '.NET Core Visual Studio Extension' 'exe' '/quiet' $DownloadFolder https://marketplace.visualstudio.com/items?itemName=JacquesEloff.MicrosoftASPNETandWebTools-9689 'DotNetCore.1.0.1-VS2015Tools.Preview2.0.3' # for visual studio
+    choco install visualstudio2017-workload-netcoretools    --limitoutput --includeOptional
+    choco install visualstudio2017-workload-netweb          --limitoutput
+    choco install visualstudio2017-workload-node            --limitoutput
+    choco install visualstudio2017-workload-data            --limitoutput --includeOptional
 }
 
 function Install-VisualStudioCode {
     # install visual studio code and extensions
     choco install visualstudiocode  --limitoutput
 
+    choco pin add -n=visualstudiocode
+
     Update-Path
 }
 
 function Install-VSCodeExtensions {
     # need to launch vscode so user folders are created as we can install extensions
-    Start-Process code
+    $process = Start-Process code -PassThru
     Start-Sleep -s 10
+    $process.Close()
 
     code --install-extension ms-vscode.csharp
     code --install-extension ms-vscode.PowerShell
@@ -381,11 +382,10 @@ function Install-VSCodeExtensions {
     code --install-extension cake-build.cake-vscode
     code --install-extension mauve.terraform
     code --install-extension Arjun.swagger-viewer
-    code --install-extension docthis
+    code --install-extension joelday.docthis
     code --install-extension hnw.vscode-auto-open-markdown-preview
     code --install-extension wk-j.cake-runner
     code --install-extension EditorConfig.editorconfig
-    code --install-extension DavidAnson.vscode-markdownlin
     code --install-extension djabraham.vscode-yaml-validation
     code --install-extension robertohuertasm.vscode-icons
     code --install-extension PeterJausovec.vscode-docker
@@ -397,7 +397,7 @@ function Install-InternetInformationServices {
 
     # Web Management Tools Features
     choco install IIS-ManagementScriptingTools      --source windowsfeatures --limitoutput
-    choco install IIS-IIS6ManagementCompatibility   --source windowsfeatures --limitoutput # installs IIS Metbase
+    choco install IIS-IIS6ManagementCompatibility   --source windowsfeatures --limitoutput # installs IIS Metabase
 
     # Common Http Features
     choco install IIS-HttpRedirect                  --source windowsfeatures --limitoutput
@@ -411,6 +411,7 @@ function Install-InternetInformationServices {
     choco install IIS-ISAPIExtensions               --source windowsfeatures --limitoutput # required by IIS-ASPNET45
     choco install IIS-ASPNET45                      --source windowsfeatures --limitoutput # installs support for ASP.NET 4.5/4.6
     choco install IIS-ApplicationInit               --source windowsfeatures --limitoutput
+    choco install IIS-WebSockets                    --source windowsfeatures --limitoutput
 
     # Health And Diagnostics Features
     choco install IIS-LoggingLibraries              --source windowsfeatures --limitoutput # installs Logging Tools
@@ -446,24 +447,16 @@ function Install-DevFeatures {
 
 function Install-NpmPackages {
     npm install -g typescript
-    npm install -g angular-cli # angular2 cli
+    npm install -g @angular/cli # angular2 cli
+    npm install -g yarn
 }
 
 function Install-PowerShellModules {
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Trusted'
-    Install-Module -Name Carbon
+    Install-Module -Name Carbon -AllowClobber
     Install-Module -Name PowerShellHumanizer
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Untrusted'
-}
-
-function Set-ChocoDevAppPins {
-    # pin apps that update themselves
-    choco pin add -n=visualstudiocode
-    choco pin add -n=visualstudio2015community
-    choco pin add -n=sourcetree
-    choco pin add -n=gitkraken
-    choco pin add -n=firefox
 }
 
 function Set-RegionalSettings {
@@ -481,7 +474,6 @@ function Set-BaseSettings {
     Update-ExecutionPolicy -Policy Unrestricted
 
     $sytemDrive = Get-SystemDrive
-    Set-Volume -DriveLetter $sytemDrive -NewFileSystemLabel "OS"
     Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -DisableShowProtectedOSFiles -EnableShowFileExtensions -EnableShowFullPathInTitleBar
     Set-TaskbarOptions -Combine Never
 
@@ -514,6 +506,12 @@ function Set-DevDesktopSettings {
 }
 
 function Update-WindowsLibraries {
+    if(-not(Test-Path Env:\BoxStarter:CustomiseFolders)) {
+        return
+    }
+    
+    Set-Volume -DriveLetter $sytemDrive -NewFileSystemLabel "OS"
+
     $dataDriveLetter = Get-DataDrive
     $dataDrive = "$dataDriveLetter`:"
 
@@ -614,9 +612,6 @@ Write-BoxstarterMessage "Starting installs"
 
 Use-Checkpoint -Function ${Function:Install-CoreApps} -CheckpointName 'InstallCoreApps' -SkipMessage 'Core apps are already installed'
 
-# pin chocolatey app that self-update
-Use-Checkpoint -Function ${Function:Set-ChocoCoreAppPins} -CheckpointName 'ChocoCoreAppPins' -SkipMessage 'Core apps are already pinned'
-
 Use-Checkpoint -Function ${Function:Set-BaseDesktopSettings} -CheckpointName 'BaseDesktopSettings' -SkipMessage 'Base desktop settings are already configured'
 
 if (Test-Path env:\BoxStarter:InstallDev) {
@@ -629,24 +624,26 @@ if (Test-Path env:\BoxStarter:InstallDev) {
     Use-Checkpoint -Function ${Function:Install-InternetInformationServices} -CheckpointName 'InternetInformationServices' -SkipMessage 'IIS features are already configured'
 
     #install sql tools
-    Use-Checkpoint -Function ${Function:Install-SqlTools} -CheckpointName 'SqlTools' -SkipMessage 'SQL Tools are already installed'
+    Use-Checkpoint -Function ${Function:Install-SqlTools} -CheckpointName 'SqlTools' -SkipMessage 'SQL Tools are already installed' $tempInstallFolder
 
     if (Test-PendingReboot) { Invoke-Reboot }
 
     #install sql server 2014
     Use-Checkpoint -Function ${Function:Install-SqlServer2014} -CheckpointName 'SqlServer2014' -SkipMessage 'SQL Server 2014 are already installed' $dataDrive
 
-   	if (Test-PendingReboot) { Invoke-Reboot }
+       if (Test-PendingReboot) { Invoke-Reboot }
 
     #install sql server 2016
     Use-Checkpoint -Function ${Function:Install-SqlServer2016} -CheckpointName 'SqlServer2016' -SkipMessage 'SQL Server 2016 are already installed' $dataDrive
 
-    #install vs2015 an extensions
-    Use-Checkpoint -Function ${Function:Install-VisualStudio2015} -CheckpointName 'VisualStudio2015' -SkipMessage 'Visual Studio 2015 is already installed'
-    Use-Checkpoint -Function ${Function:Install-VisualStudio2015Extensions} -CheckpointName 'VS2015Extensions' -SkipMessage 'Visual Studio 2015 extensions are already installed' $tempInstallFolder
+    #install vs2017 enterprise
+    Use-Checkpoint -Function ${Function:Install-VisualStudio2017Enterprise} -CheckpointName 'VisualStudio2017Enterprise' -SkipMessage 'Visual Studio 2017 Enterprise is already installed'
 
-    #install vs2017
-    Use-Checkpoint -Function ${Function:Install-VisualStudio2017} -CheckpointName 'VisualStudio2017' -SkipMessage 'Visual Studio 2017 is already installed'
+    #install vs2017 community
+    Use-Checkpoint -Function ${Function:Install-VisualStudio2017} -CheckpointName 'VisualStudio2017Community' -SkipMessage 'Visual Studio 2017 Community is already installed'
+
+    #install vs2017 workloads
+    Use-Checkpoint -Function ${Function:Install-VisualStudio2017Workloads} -CheckpointName 'VisualStudio2017Workloads' -SkipMessage 'Visual Studio 2017 Workloads are already installed'
 
     #install vscode and extensions
     Use-Checkpoint -Function ${Function:Install-VisualStudioCode} -CheckpointName 'VisualStudioCode' -SkipMessage 'VSCode is already installed'
@@ -663,9 +660,6 @@ if (Test-Path env:\BoxStarter:InstallDev) {
 
     # make folder for source code
     New-SourceCodeFolder
-
-    # pin chocolatey app that self-update
-    Use-Checkpoint -Function ${Function:Set-ChocoDevAppPins} -CheckpointName 'ChocoDevAppPins' -SkipMessage 'Dev apps are already pinned'
 
     Use-Checkpoint -Function ${Function:Set-DevDesktopSettings} -CheckpointName 'DevDesktopSettings' -SkipMessage 'Dev desktop settings are already configured'
 }

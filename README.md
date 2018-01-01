@@ -16,7 +16,7 @@ The Bootstrapper method is the recommended way to run this script. Simply open a
 console and run the following command
 
 ```powershell
-> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" <arguments> }
+wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" <arguments> }
 ```
 
 You can remove *&lt;arguments&gt;* or replace it with one or more argument lists below
@@ -27,8 +27,11 @@ You can remove *&lt;arguments&gt;* or replace it with one or more argument lists
 |InstallHome|Switch||Configures machine for home and install home apps|
 |SkipWindowsUpdate|Switch||Skips running windows update|
 |DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
-|SourceCodeFolder|String|InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
+|SourceCodeFolder|String|InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value (default value `/sourcecode`|
 |EnableWindowsAuthFeature|Switch|InstallDev|Enable Windows Authentication in IIS|
+|InstallVS2017Community|Switch|InstallDev|Install Visual Studio 2017 Community edition|
+|InstallVS2017Enterprise|Switch|InstallDev|Install Visual Studio 2017 Enterprise edition|
+|CustomiseFolders|Switch||Customise Folder locations and disk names|
 |SqlServer2016IsoImage|String|InstallDev|Absolute path to Sql Server 2016 ISO|
 |SqlServer2014IsoImage|String|InstallDev|Absolute path to Sql Server 2014 ISO|
 
@@ -36,33 +39,33 @@ You can remove *&lt;arguments&gt;* or replace it with one or more argument lists
 
 1. Setup a development box without windows update
 
-```powershell
-> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SkipWindowsUpdate }
-```
+    ```powershell
+    wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -InstallVS2017Enterprise -SkipWindowsUpdate }
+    ```
 
 1. Setup a development box, move windows libraries and source code folder to another drive
 
-```powershell
-> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -DataDrive 'D' -SourceCodeFolder '/source' }
-```
+    ```powershell
+    wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -InstallVS2017Community -CustomiseFolders -DataDrive 'D' -SourceCodeFolder '/source' }
+    ```
 
 1. Setup a development box with sql server 2016
 
-```powershell
-> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SqlServer2016IsoImage 'D:/temp/en_sql_server_2016_developer_x64_dvd_8777069.iso' }
-```
+    ```powershell
+    wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -InstallVS2017Enterprise -SqlServer2016IsoImage 'D:/temp/en_sql_server_2016_developer_x64_dvd_8777069.iso' }
+    ```
 
 1. Setup a development box with sql server 2014
 
-```powershell
-> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -SqlServer2014IsoImage 'D:/temp/en_sql_server_2014_developer_x64_dvd_8777069.iso' }
-```
+    ```powershell
+    wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallDev -InstallVS2017Community -SqlServer2014IsoImage 'D:/temp/en_sql_server_2014_developer_x64_dvd_8777069.iso' }
+    ```
 
 1. Setup a home box
 
-```powershell
-> wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallHome }
-```
+    ```powershell
+    wget -Uri 'https://raw.githubusercontent.com/JonCubed/boxstarter/master/bootstrap.ps1' -OutFile "$($env:temp)\bootstrap.ps1";&Invoke-Command -ScriptBlock { &"$($env:temp)\bootstrap.ps1" -InstallHome }
+    ```
 
 
 ### Manual
@@ -79,6 +82,9 @@ If you want more control over what is happening you can manually run the script.
     |BoxStarter:DataDrive|Char||Drive letter to move data too. Defaults to System Drive|
     |BoxStarter:SourceCodeFolder|String|BoxStarter:InstallDev|Relative or Absolute path to source code folder. If relative will use Data Drive value|
     |BoxStarter:EnableWindowsAuthFeature|1|BoxStarter:InstallDev|Enable Windows Authentication in IIS|
+    |BoxStarter:CustomiseFolders|1||Customise Folder locations and disk names|
+    |BoxStarter:InstallVS2017Community|1|Install Visual Studio 2017 Community edition|
+    |BoxStarter:InstallVS2017Enterprise|1|Install Visual Studio 2017 Enterprise edition|
     |choco:sqlserver2016:isoImage|String|BoxStarter:InstallDev|Absolute path to Sql Server 2016 ISO|
     |choco:sqlserver2014:isoImage|String|BoxStarter:InstallDev|Absolute path to Sql Server 2014 ISO|
 
@@ -89,7 +95,7 @@ If you want more control over what is happening you can manually run the script.
     * In Command prompt or Powershell
 
     ```powershell
-    > START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
+    START http://boxstarter.org/package/nr/url?http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/JonCubed/boxstarter/master/box.ps1
     ```
 
   * In Edge Or Internet Explorer, go to

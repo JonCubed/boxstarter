@@ -18,6 +18,15 @@ param
     [Switch]
     $EnableWindowsAuthFeature,
 
+    [Switch]
+    $InstallVS2017Community,
+
+    [Switch]
+    $InstallVS2017Enterprise,
+
+    [Switch]
+    $CustomiseFolders,
+
     [String]
     $SqlServer2016IsoImage,
 
@@ -77,6 +86,21 @@ if ($SkipWindowsUpdate)
 if ($EnableWindowsAuthFeature)
 {
     Set-EnvironmentVariable -Key "BoxStarter:EnableWindowsAuthFeature" -Value "1"
+}
+
+if ($InstallVS2017Community)
+{
+    Set-EnvironmentVariable -Key "BoxStarter:InstallVS2017Community" -Value "1"
+}
+
+if ($InstallVS2017Enterprise)
+{
+    Set-EnvironmentVariable -Key "BoxStarter:InstallVS2017Enterprise" -Value "1"
+}
+
+if ($CustomiseFolders)
+{
+    Set-EnvironmentVariable -Key "BoxStarter:CustomiseFolders" -Value "1"
 }
 
 if ($SqlServer2016IsoImage)
